@@ -1,0 +1,136 @@
+# Dependencies and Setup
+import matplotlib.pyplot as plt
+import pandas as pd
+import scipy.stats as st
+
+# Study data files
+mouse_metadata_path = "data/Mouse_metadata.csv"
+study_results_path = "data/Study_results.csv"
+
+# Read the mouse data and the study results
+mouse_metadata = pd.read_csv(mouse_metadata_path)
+study_results = pd.read_csv(study_results_path)
+
+# Combine the data into a single DataFrame
+merged_data = pd.merge(study_results, mouse_metadata, on="Mouse ID", how="left")
+
+# Display the data table for preview
+merged_data 
+
+
+num_mice = merged_data["Mouse ID"].nunique()
+
+num_mice 
+
+# Our data should be uniquely identified by Mouse ID and Timepoint
+# Get the duplicate mice by ID number that shows up for Mouse ID and Timepoint. 
+
+
+
+duplicate_mice_g989 = merged_data[merged_data["Mouse ID"] == 'g989']
+
+
+duplicate_mice_g989
+
+# Create a clean DataFrame by dropping the duplicate mouse by its ID.
+# Get the indices of rows with Mouse ID 'g989'
+duplicate_indices_g989 = merged_data[merged_data["Mouse ID"] == 'g989'].index
+
+# Drop the rows with Mouse ID 'g989'
+cleaned_data = merged_data.drop(duplicate_indices_g989)
+
+cleaned_data 
+
+# Checking the number of mice in the clean DataFrame.
+
+num_mice_cleaned = cleaned_data["Mouse ID"].nunique()
+
+num_mice_cleaned 
+
+# Generate a summary statistics table of mean, median, variance, standard deviation, and SEM of the tumor volume for each regimen
+
+# Generate a summary statistics table of mean, median, variance, standard deviation, and SEM of the tumor volume for each regimen
+
+# Use groupby and summary statistical methods to calculate the following properties of each drug regimen: 
+# mean, median, variance, standard deviation, and SEM of the tumor volume. 
+# Assemble the resulting series into a single summary DataFrame.
+
+
+sum_stat_table_average = cleaned_data.groupby("Drug Regimen")["Tumor Volume (mm3)"].mean()
+sum_stat_table_median = cleaned_data.groupby("Drug Regimen")["Tumor Volume (mm3)"].median()
+sum_stat_table_variance = cleaned_data.groupby("Drug Regimen")["Tumor Volume (mm3)"].var()
+sum_stat_table_std = cleaned_data.groupby("Drug Regimen")["Tumor Volume (mm3)"].std()
+sum_stat_table_sem = cleaned_data.groupby("Drug Regimen")["Tumor Volume (mm3)"].sem()
+
+stat_sum_data_frame = pd.DataFrame({"Mean Tumor Volume": sum_stat_table_average, "Median Tumor Volume": sum_stat_table_median, "Tumor Volume Variance": sum_stat_table_variance, 
+                                    "Tumor Volume St. Dev": sum_stat_table_std, "Tumor Volume Std. Err": sum_stat_table_sem})
+
+stat_sum_data_frame 
+
+regimen_counts = cleaned_data.groupby("Drug Regimen").size()
+
+regimen_counts.plot(kind="bar", figsize=(10, 6), color="green", alpha=0.7)
+
+
+plt.title("Mouse/Timepoint")
+plt.xlabel("Drug Regimen")
+plt.ylabel("# of Observed Mouse Timepoints")
+
+
+
+
+plt.tight_layout()
+plt.show()
+
+# Generate a bar plot showing the total number of rows (Mouse ID/Timepoints) for each drug regimen using pyplot.
+
+import matplotlib.pyplot as plt
+
+# Group the data by "Drug Regimen" and count the number of rows for each regimen
+regimen_counts = cleaned_data.groupby("Drug Regimen").size()
+
+# Create a bar plot using pyplot
+plt.figure(figsize=(10, 6))
+plt.bar(regimen_counts.index, regimen_counts.values, color="green", alpha=0.7)
+
+# Set the title and labels
+plt.title("Mouse/Timepoint ")
+plt.xlabel("Drug Regimen")
+plt.ylabel("# of Observed Mouse Timepoints")
+
+
+
+# Show the plot
+plt.tight_layout()
+plt.show()
+
+# Generate a pie plot showing the distribution of female versus male mice using Pandas
+
+gender_distribution = cleaned_data["Sex"].value_counts()
+
+
+gender_distribution.plot(kind="pie", figsize=(8, 8), autopct='%1.1f%%', colors=["green", "blue"])
+
+# Set the title and labels
+plt.title("Sex")
+plt.ylabel("")
+
+# Show the plot
+plt.show()
+
+# Generate a pie plot showing the distribution of female versus male mice using pyplot
+
+import matplotlib.pyplot as plt
+
+# Count the number of male and female mice
+gender_distribution = cleaned_data["Sex"].value_counts()
+
+# Create a pie plot using pyplot
+plt.figure(figsize=(8, 8))
+plt.pie(gender_distribution, labels=gender_distribution.index, autopct='%1.1f%%', colors=["green", "blue"])
+
+# Set the title
+plt.title("Sex")
+
+# Show the plot
+plt.show()
